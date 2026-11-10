@@ -1,0 +1,41 @@
+# BrainVLN_v5 离线模仿。在项目根目录运行，直接改本文件即可。
+# PYTHONPATH=. python scripts/brain_vln/train_v5.py
+# 临时覆盖：PYTHONPATH=. python scripts/brain_vln/train_v5.py epochs=1 batch_size=2
+# v2 仍用 scripts/brain_vln/train_il.py 原来的参数。resume 留空时，输出目录已存在就拒绝启动。
+
+# 100 个检查点大约 70GB。根分区只剩约 50GB，所以放到 SSD 软链接下。
+output: storage/brain_vln/external_ssd1/BrainVLN_v5
+root: storage/collect_data/train
+device: cuda
+seed: 0
+
+brain: v5
+variant: B4
+layout: cells
+encoder: mlanet
+stdp: false
+
+epochs: 100
+batch_size: 128
+microbatch: 32
+workers: 2
+lr: 1.0e-3
+grad_clip: 1.0
+checkpoint_every: 200
+data_parallel: false
+resume: ""
+
+episodic_tau: 30.0
+stop_neurons: 64
+view_change_threshold: 0.05
+
+stdp_a_pos: 1.0e-4
+stdp_a_neg: 1.0e-2
+stdp_tau: 3.0
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  output_subdir: null

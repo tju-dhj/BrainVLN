@@ -1,0 +1,48 @@
+# BrainVLN_v2 PPO。在项目根目录运行，直接改本文件即可。
+# 临时覆盖：python scripts/brain_vln/train_rl.py environments=4 ppo.clip=0.2
+# init 留空时，从 eval_root 里已完成的 val-unseen 评估中选 SPL 最高的检查点。
+
+init: ""
+eval_root: storage/brain_vln/experiments/BrainVLN_v2_val_unseen
+output: storage/brain_vln/experiments/BrainVLN_v2_ppo
+data: storage/collect_data/train
+scenes: data/scene_datasets
+device: cuda
+sim_gpu: 0
+seed: 0
+
+environments: 8
+updates: 100000
+rollout_steps: 32
+mini_batches: 1
+checkpoints: 20
+reward_window: 50
+resume_interval: 100
+max_episode_steps: 500
+
+ppo:
+  clip: 0.1
+  epochs: 1
+  value_coef: 0.5
+  entropy_coef: 0.01
+  learning_rate: 2.5e-5
+  max_grad_norm: 0.5
+  gamma: 0.99
+  gae_lambda: 0.95
+  adam_eps: 1.0e-5
+  normalize_advantage: false
+  linear_lr_decay: true
+  linear_clip_decay: true
+
+reward:
+  slack_reward: -0.02
+  success_reward: 8.0
+  distance_scalar: 1.0
+  success_distance: 3.0
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  output_subdir: null

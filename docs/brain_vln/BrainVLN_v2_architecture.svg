@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1400" viewBox="0 0 2200 1400">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f7fbff"/><stop offset="1" stop-color="#eef3f8"/></linearGradient>
+    <linearGradient id="brain" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff8fb"/><stop offset="1" stop-color="#f4eefa"/></linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#334155"/></marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#2563eb"/></marker>
+    <marker id="arrowPink" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#be185d"/></marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#64748b" flood-opacity="0.18"/></filter>
+    <style>
+      .title{font:700 40px 'Segoe UI',Arial,sans-serif;fill:#0f172a}.subtitle{font:400 18px 'Segoe UI',Arial,sans-serif;fill:#475569}
+      .section{font:700 22px 'Segoe UI',Arial,sans-serif;fill:#0f172a}.label{font:600 18px 'Segoe UI',Arial,sans-serif;fill:#0f172a}.small{font:400 15px 'Segoe UI',Arial,sans-serif;fill:#475569}.tiny{font:400 13px 'Segoe UI',Arial,sans-serif;fill:#64748b}
+      .box{stroke:#cbd5e1;stroke-width:2}.line{fill:none;stroke:#334155;stroke-width:3;marker-end:url(#arrow)}.blue{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#arrowBlue)}.pink{fill:none;stroke:#be185d;stroke-width:3;stroke-dasharray:9 7;marker-end:url(#arrowPink)}
+    </style>
+  </defs>
+  <rect width="2200" height="1400" fill="url(#bg)"/>
+  <text x="90" y="78" class="title">BrainVLN_v2 · Goal–Spatial Structured Spiking Navigation</text>
+  <text x="92" y="112" class="subtitle">Code-grounded framework view · default BrainVLNConfig: B5 / 4096 neurons / internal_steps=2 / delayed synapses 1–4</text>
+
+  <!-- Inputs -->
+  <rect x="70" y="190" width="350" height="750" rx="28" fill="#ffffff" class="box" filter="url(#shadow)"/>
+  <text x="100" y="235" class="section">Sensors &amp; context</text>
+  <rect x="100" y="270" width="290" height="100" rx="18" fill="#e0f2fe" class="box"/>
+  <text x="125" y="307" class="label">RGB frame</text><text x="125" y="337" class="small">[B, 3, 224, 224]</text><text x="125" y="360" class="tiny">current visual observation</text>
+  <rect x="100" y="395" width="290" height="100" rx="18" fill="#dcfce7" class="box"/>
+  <text x="125" y="432" class="label">Depth + depth_valid</text><text x="125" y="462" class="small">[B, 1, 224, 224]</text><text x="125" y="485" class="tiny">meter-scaled depth, masked if invalid</text>
+  <rect x="100" y="520" width="290" height="105" rx="18" fill="#fef3c7" class="box"/>
+  <text x="125" y="557" class="label">Instruction tokens</text><text x="125" y="587" class="small">tokens [B, L] + token_mask</text><text x="125" y="610" class="tiny">full instruction; FSA spans optional</text>
+  <rect x="100" y="650" width="290" height="100" rx="18" fill="#fce7f3" class="box"/>
+  <text x="125" y="687" class="label">Previous action</text><text x="125" y="717" class="small">STOP / FORWARD / LEFT / RIGHT</text><text x="125" y="740" class="tiny">start id=4, then executed action history</text>
+  <rect x="100" y="775" width="290" height="125" rx="18" fill="#f1f5f9" class="box"/>
+  <text x="125" y="812" class="label">Sequence control</text><text x="125" y="842" class="small">valid_mask · reset_mask</text><text x="125" y="868" class="small">detach_mask · optional fsa_state</text>
+  <text x="100" y="925" class="tiny">Only RGB, depth, instruction and executed history enter inference.</text>
+
+  <!-- Frontend -->
+  <rect x="480" y="190" width="360" height="750" rx="28" fill="#ffffff" class="box" filter="url(#shadow)"/>
+  <text x="510" y="235" class="section">Frontend</text>
+  <rect x="510" y="275" width="300" height="105" rx="18" fill="#dbeafe" class="box"/>
+  <text x="535" y="312" class="label">RGB ConvEncoder</text><text x="535" y="342" class="small">Conv 3→16→32→32</text><text x="535" y="365" class="tiny">→ feature_dim (default 64)</text>
+  <rect x="510" y="405" width="300" height="105" rx="18" fill="#dcfce7" class="box"/>
+  <text x="535" y="442" class="label">Depth ConvEncoder</text><text x="535" y="472" class="small">same compact CNN path</text><text x="535" y="495" class="tiny">depth × depth_valid</text>
+  <rect x="510" y="535" width="300" height="105" rx="18" fill="#fef3c7" class="box"/>
+  <text x="535" y="572" class="label">InstructionEncoder</text><text x="535" y="602" class="small">Embedding → masked mean</text><text x="535" y="625" class="tiny">SubinstructionEncoder stays empty unless spans</text>
+  <rect x="510" y="665" width="300" height="105" rx="18" fill="#fce7f3" class="box"/>
+  <text x="535" y="702" class="label">RGBDFusion + history</text><text x="535" y="732" class="small">concat projection or cross-attention</text><text x="535" y="755" class="tiny">action embedding → history code</text>
+  <rect x="510" y="795" width="300" height="105" rx="18" fill="#f8fafc" class="box"/>
+  <text x="535" y="832" class="label">Optional frozen map path</text><text x="535" y="862" class="small">FrozenMLANet / MetaSpikeformer</text><text x="535" y="885" class="tiny">cells layout; direct-drive code path</text>
+
+  <!-- Input arrows -->
+  <path d="M390 320 C430 320 450 320 510 325" class="blue"/><path d="M390 445 C430 445 450 445 510 455" class="blue"/>
+  <path d="M390 575 C430 575 450 575 510 585" class="blue"/><path d="M390 700 C430 700 450 700 510 715" class="blue"/>
+  <path d="M390 835 C430 835 450 835 510 845" class="line"/>
+
+  <!-- Brain -->
+  <path d="M1030 240 C935 205 850 278 875 365 C808 408 825 505 891 532 C850 615 898 695 970 698 C956 790 1056 837 1124 787 C1185 845 1300 826 1307 736 C1388 722 1414 632 1364 574 C1420 520 1386 424 1320 409 C1340 315 1247 244 1169 286 C1135 225 1066 210 1030 240 Z" fill="url(#brain)" stroke="#7c3aed" stroke-width="4" filter="url(#shadow)"/>
+  <path d="M1100 270 C1070 360 1070 650 1100 785" fill="none" stroke="#c4b5fd" stroke-width="3" stroke-dasharray="10 10"/>
+  <text x="1000" y="176" class="section">Structured spiking brain</text>
+  <text x="954" y="202" class="small">B5 default · one persistent ReservoirState per environment</text>
+
+  <!-- Lobes -->
+  <ellipse cx="965" cy="400" rx="125" ry="112" fill="#bae6fd" fill-opacity="0.92" stroke="#0284c7" stroke-width="3"/>
+  <ellipse cx="1230" cy="400" rx="115" ry="112" fill="#fde68a" fill-opacity="0.92" stroke="#d97706" stroke-width="3"/>
+  <ellipse cx="965" cy="635" rx="135" ry="115" fill="#fbcfe8" fill-opacity="0.94" stroke="#db2777" stroke-width="3"/>
+  <ellipse cx="1235" cy="635" rx="115" ry="115" fill="#bbf7d0" fill-opacity="0.94" stroke="#16a34a" stroke-width="3"/>
+  <text x="905" y="392" class="label">SPATIAL</text><text x="894" y="420" class="small">1536 LIF/ALIF</text><text x="885" y="446" class="tiny">RGB-D / history current</text>
+  <text x="1180" y="392" class="label">GOAL</text><text x="1165" y="420" class="small">768 LIF/ALIF</text><text x="1155" y="446" class="tiny">instruction current</text>
+  <text x="894" y="627" class="label">EPISODIC</text><text x="895" y="655" class="small">1280 LIF/ALIF</text><text x="880" y="681" class="tiny">event-gated memory writes</text>
+  <text x="1190" y="627" class="label">ACTION</text><text x="1188" y="655" class="small">512 LIF/ALIF</text><text x="1168" y="681" class="tiny">control population</text>
+
+  <!-- Brain routing arrows -->
+  <path d="M1070 400 C1100 365 1135 365 1145 400" class="line"/>
+  <path d="M1000 485 C1010 525 1010 545 1000 550" class="line"/>
+  <path d="M1030 440 C1100 520 1160 555 1190 590" class="line"/>
+  <path d="M1230 485 C1225 530 1225 545 1230 550" class="line"/>
+  <path d="M1120 635 C1140 625 1165 625 1182 635" class="line"/>
+  <path d="M1300 690 C1320 710 1305 740 1275 742" class="line"/>
+  <path d="M1195 700 C1150 760 1080 770 1030 705" class="line"/>
+  <text x="1015" y="520" class="tiny">Spatial→Goal / Episodic / Action</text>
+  <text x="1120" y="548" class="tiny">Goal↔Episodic</text>
+  <text x="1280" y="730" class="tiny">Action recurrent</text>
+
+  <!-- Synapse and dynamics note -->
+  <rect x="890" y="850" width="465" height="120" rx="18" fill="#ffffff" stroke="#a78bfa" stroke-width="2"/>
+  <text x="915" y="885" class="label">SynapticGraph</text><text x="915" y="913" class="small">structured routes · out_degree=48</text><text x="915" y="939" class="small">fixed delays 1–4 · sign + decay τsyn</text>
+
+  <!-- Event memory -->
+  <rect x="1415" y="250" width="340" height="310" rx="24" fill="#fff1f2" stroke="#fb7185" stroke-width="3" filter="url(#shadow)"/>
+  <text x="1445" y="295" class="section">EventMemory</text>
+  <text x="1445" y="327" class="small">B5 only · episodic write gate</text>
+  <rect x="1445" y="355" width="280" height="65" rx="14" fill="#ffe4e6" class="box"/><text x="1465" y="394" class="label">Visual surprise</text><text x="1465" y="414" class="tiny">predictor(previous spatial) − current</text>
+  <rect x="1445" y="440" width="280" height="65" rx="14" fill="#fce7f3" class="box"/><text x="1465" y="479" class="label">Task switch</text><text x="1465" y="499" class="tiny">FSA state change; zero if absent</text>
+  <path d="M1320 430 C1370 430 1390 405 1445 387" class="pink"/><path d="M1330 420 C1380 460 1390 470 1445 472" class="pink"/>
+  <path d="M1445 520 C1370 590 1320 625 1290 640" class="pink"/>
+  <text x="1372" y="603" class="tiny">gate → Episodic write</text>
+  <text x="1438" y="540" class="tiny">surprise / task-aware / periodic modes</text>
+
+  <!-- Output -->
+  <rect x="1450" y="660" width="330" height="255" rx="24" fill="#ffffff" class="box" filter="url(#shadow)"/>
+  <text x="1480" y="705" class="section">Readout &amp; diagnostics</text>
+  <rect x="1480" y="735" width="270" height="70" rx="14" fill="#dcfce7" class="box"/><text x="1500" y="774" class="label">Action + Goal → Linear</text><text x="1500" y="795" class="tiny">4 action logits</text>
+  <text x="1480" y="844" class="small">progress_head(Episodic)</text><text x="1480" y="870" class="small">surprise · task_switch · firing_rate</text><text x="1480" y="896" class="small">covariance (B4/B5 separation)</text>
+  <path d="M1290 635 C1370 670 1410 700 1480 770" class="line"/>
+  <path d="M1350 635 C1400 650 1430 700 1480 770" class="line"/>
+
+  <rect x="1860" y="310" width="270" height="230" rx="24" fill="#ffffff" class="box" filter="url(#shadow)"/>
+  <text x="1890" y="355" class="section">Output</text>
+  <text x="1890" y="400" class="label">STOP</text><text x="1890" y="435" class="label">MOVE_FORWARD</text><text x="1890" y="470" class="label">TURN_LEFT</text><text x="1890" y="505" class="label">TURN_RIGHT</text>
+  <path d="M1755 770 C1820 770 1825 480 1860 430" class="line"/>
+
+  <!-- closed loop -->
+  <path d="M2000 550 C2020 650 1990 1040 1700 1060 C1350 1085 780 1080 380 950 C300 925 260 820 260 760" class="blue"/>
+  <text x="1310" y="1090" class="label">closed-loop execution: action_t → simulator → RGB_t+1 / Depth_t+1</text>
+  <path d="M380 760 C320 760 300 760 260 760" class="blue"/>
+
+  <!-- State panel -->
+  <rect x="480" y="1020" width="740" height="245" rx="24" fill="#ffffff" class="box" filter="url(#shadow)"/>
+  <text x="515" y="1065" class="section">Persistent ReservoirState</text>
+  <text x="515" y="1105" class="small">membrane · spike · adaptation · synaptic_current · delay_queue</text>
+  <text x="515" y="1135" class="small">time · spatial_trace · staleness · hidden · pre/post traces</text>
+  <text x="515" y="1180" class="label">Episode boundary:</text><text x="690" y="1180" class="small">reset_mask.zero_rows()</text>
+  <text x="515" y="1215" class="label">TBPTT:</text><text x="610" y="1215" class="small">detach_mask.detach()</text>
+  <text x="515" y="1245" class="tiny">Internal SNN steps k=2 per navigation step t; state carries across t.</text>
+
+  <!-- Legend -->
+  <rect x="1460" y="1010" width="670" height="255" rx="24" fill="#f8fafc" class="box"/>
+  <text x="1490" y="1055" class="section">Implementation notes</text>
+  <circle cx="1505" cy="1090" r="8" fill="#2563eb"/><text x="1525" y="1096" class="small">solid blue: sensor / closed-loop data flow</text>
+  <circle cx="1505" cy="1130" r="8" fill="#334155"/><text x="1525" y="1136" class="small">solid dark: learned neural routing</text>
+  <circle cx="1505" cy="1170" r="8" fill="#be185d"/><text x="1525" y="1176" class="small">dashed pink: optional/event modulation</text>
+  <text x="1490" y="1215" class="tiny">Default config uses conv encoders and B5. Frozen MLANet/MetaSpikeformer</text>
+  <text x="1490" y="1238" class="tiny">is an optional code path; FSA task-switch stays zero without supplied spans.</text>
+</svg>

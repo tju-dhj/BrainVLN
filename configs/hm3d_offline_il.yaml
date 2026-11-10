@@ -1,0 +1,37 @@
+# HM3D offline imitation learning. Edit this file for later runs.
+# A one-off change can still be appended on the command line: batch_size=16 epochs=3
+data: ???
+output: ???
+validation_data: ""
+init_checkpoint: ""
+resume: ""
+
+epochs: 0
+updates: 200
+batch_size: 32
+window: 16
+context: 8
+lr: 3.0e-4
+seed: 12345
+calibration_batches: 32
+class_balance: none
+transition_c: 3.0
+normalization: frozen_bn
+spn_stability: none
+health_every: 0
+workers: 0
+fixed: false
+no_pretrained: false
+save_every: 100
+log_every: 10
+score_batches: 8
+
+student_eval_list: ""
+keep_sr_checkpoints: 2
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  output_subdir: null

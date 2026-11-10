@@ -1,0 +1,21 @@
+# R2R-CE offline teacher forcing. The scripts read these values as their defaults.
+# This is the VLN-CE ground-truth action sequence in {split}_gt.json.gz, not online DAgger.
+task: r2rce
+dataset: storage/datasets/R2R_VLNCE_v1-3_preprocessed
+scenes: data/scene_datasets
+train_split: train
+eval_split: val_unseen
+actions: [STOP, MOVE_FORWARD, TURN_LEFT, TURN_RIGHT]
+forward_step_m: 0.25
+turn_angle_deg: 15
+success_distance_m: 3.0
+max_episode_steps: 500
+lr: 2.5e-4
+epochs: 30
+batch_size: 2
+inflection_weight_coef: 3.2
+grad_clip: 0.5
+instruction_hidden: 128
+rgb: 224
+hfov: 90
+sensor_height_m: 1.25
