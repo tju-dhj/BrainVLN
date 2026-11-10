@@ -36,7 +36,51 @@ BrainVLN 在 VLN-CE 的 R2R 上做连续视觉语言导航。冻结的视觉和�
 
 ## 环境
 
-在仓库根目录运行，使用项目里的 Python 3.9 环境，并带上 `PYTHONPATH=.`：
+BrainVLN 使用单独的 conda 环境，装在仓库内的 `storage/brain_vln/envs/BrainVLN`。Python 3.9.23，Habitat-Sim 0.3.3（headless、无 Bullet），PyTorch `2.6.0+cu126`，torchvision `0.21.0+cu126`。闭环评估需要这个 Habitat-Sim；只跑离线模仿时，仿真器可以先不调用。
+
+`environment.yml` 和 `scripts/setup_env.sh` 对应更早的 `spikingnav` 环境（AllenAct / AI2-THOR）。配置 BrainVLN 时按下面的命令，不要用那份 yml。
+
+在 Linux x86_64 上，从仓库根目录执行。`--prefix` 把环境放进本仓库，换机器时路径跟着项目走。
+
+```bash
+conda create -y -p storage/brain_vln/envs/BrainVLN \
+  -c aihabitat -c conda-forge \
+  python=3.9 \
+  habitat-sim=0.3.3=py3.9_headless_linux_acbe6f4922e68145e401e55c30f9dfea460a3f24 \
+  matplotlib
+conda activate storage/brain_vln/envs/BrainVLN
+
+pip install torch==2.6.0 torchvision==0.21.0 \
+  --index-url https://download.pytorch.org/whl/cu126
+pip install -r requirements-brainvln.txt
+```
+
+那个 Habitat-Sim 构建串就是当前环境的包。若频道里已经没有这条构建，改成同一版本的 headless 变体：
+
+```bash
+conda create -y -p storage/brain_vln/envs/BrainVLN \
+  -c aihabitat -c conda-forge \
+  python=3.9 habitat-sim=0.3.3 headless matplotlib
+```
+
+`habitat` 这个 Python 包来自 Habitat-Lab 0.3.3，本机是可编辑安装。BrainVLN 的 R2R 闭环走 `habitat_sim`，不依赖 Lab 的 Env。需要 Lab 时，把 0.3.3 源码放到 `third_party/` 再安装：
+
+```bash
+git clone --depth 1 --branch v0.3.3 \
+  https://github.com/facebookresearch/habitat-lab.git \
+  third_party/habitat-lab
+pip install -e third_party/habitat-lab/habitat-lab
+```
+
+装完后核对版本，并确认能看到 GPU：
+
+```bash
+python -c "import torch, habitat_sim; print(torch.__version__, torch.cuda.is_available(), habitat_sim.__version__)"
+```
+
+期望输出里有 `2.6.0+cu126`、`True` 和 `0.3.3`。驱动需要能跑 CUDA 12.6 的轮子。
+
+以后在仓库根目录运行，并带上 `PYTHONPATH=.`：
 
 ```bash
 export PYTHONPATH="$PWD"
