@@ -118,7 +118,7 @@ EnvDrop 和 DAgger 从一份 v2 检查点接着训。日程与 MLANet 的发布�
 "$PY" -u scripts/brain_vln/train_envdrop_dagger.py \
   --init storage/brain_vln/experiments/BrainVLN_v2/ckpt_epoch_89.pt \
   --output storage/brain_vln/experiments/BrainVLN_v2_envdrop \
-  --dataset /path/to/R2R_VLNCE_FSASub \
+  --dataset storage/datasets/R2R_VLNCE_FSASub \
   --scenes data/scene_datasets \
   --stage envdrop --gpus 0
 ```

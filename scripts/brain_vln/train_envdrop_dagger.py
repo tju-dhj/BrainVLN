@@ -103,10 +103,7 @@ def _source_hash() -> str:
 
 
 def _fit_tokens(instruction_tokens, sub_rows):
-    dped = Path("/home/vln/dhj/DPedPro-VLN")
-    if str(dped) not in sys.path:
-        sys.path.insert(0, str(dped))
-    from vlnce.mlanet_instructions import fit_sub_rows, r2r_tokens
+    from spikingnav.brain_vln.mlanet.instructions import fit_sub_rows, r2r_tokens
 
     return r2r_tokens(instruction_tokens, 2504), fit_sub_rows(sub_rows)
 
@@ -1121,7 +1118,7 @@ def main() -> int:
     parser.add_argument("--output", required=True)
     parser.add_argument(
         "--dataset",
-        default="/home/vln/dhj/DPedPro-VLN/data/datasets/R2R_VLNCE_FSASub",
+        default="storage/datasets/R2R_VLNCE_FSASub",
     )
     parser.add_argument("--scenes", default="data/scene_datasets")
     parser.add_argument("--gpu", type=int, default=0)

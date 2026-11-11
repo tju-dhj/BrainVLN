@@ -13,7 +13,6 @@ replaces RGB with a frozen Meta-SpikeFormer map for BrainVLN_v4.
 from __future__ import annotations
 
 import pickle
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -25,7 +24,6 @@ from spikingnav.brain_vln.metaspikeformer import FrozenMetaSpikeFormerRGB
 
 DEPTH_METERS = 10.0
 DEPTH_SIZE = 256
-_DPEDPRO = Path("/home/vln/dhj/DPedPro-VLN")
 
 
 def habitat_depth(depth: torch.Tensor, valid: torch.Tensor, max_meters: float = DEPTH_METERS) -> torch.Tensor:
@@ -105,9 +103,7 @@ class FrozenMLANet(nn.Module):
         checkpoint = Path(root) / "MLANet" / "mla_best_ppo.pth"
         if not checkpoint.is_file():
             raise FileNotFoundError(checkpoint)
-        if str(_DPEDPRO) not in sys.path:
-            sys.path.insert(0, str(_DPEDPRO))
-        from vlnce.models.mlanet_policy import build_mlanet
+        from spikingnav.brain_vln.mlanet.mlanet_policy import build_mlanet
 
         self.policy = build_mlanet(_load_state(checkpoint))
         _freeze(self.policy)
@@ -239,8 +235,7 @@ class FrozenMLANet(nn.Module):
 
     def _lookup(self, texts, device: torch.device) -> dict:
         if self._table is None:
-            from vlnce.mlanet_instructions import r2r_tokens
-            from vlnce.official_instructions import load_official_instructions
+            from spikingnav.brain_vln.mlanet.instructions import load_official_instructions, r2r_tokens
 
             self._table = load_official_instructions()
             self._r2r_tokens = r2r_tokens
